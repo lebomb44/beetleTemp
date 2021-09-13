@@ -3,7 +3,7 @@
 #include <DallasTemperature.h>
 
 
-const char nodeName[] PROGMEM = "dining";
+const char nodeName[] PROGMEM = "beetleTemp";
 const char sepName[] PROGMEM = " ";
 const char hkName[] PROGMEM = "val";
 const char cmdGetName[] PROGMEM = "get";
@@ -15,9 +15,9 @@ DallasTemperature tempSensors(&oneWire);
 uint8_t tempSensorsNb = 0;
 
 void setup() {
-  // put your setup code here, to run once:
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-  cncInit(nodeName, &Serial1);
+  cncInit(nodeName, &Serial);
   cnc_hkName_set(hkName);
   cnc_cmdGetName_set(cmdGetName);
   cnc_cmdSetName_set(cmdSetName);
@@ -25,14 +25,15 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.println("RF_TRX Starting...");
   tempSensors.begin();
   tempSensorsNb = tempSensors.getDeviceCount();
   tempSensors.requestTemperatures();
   for(uint8_t i=0; i<tempSensorsNb; i++)  {
     DeviceAddress sensorAddr;
-    cnc_print_hk_temp_sensor(tempSensorsName, sensorAddr, tempSensors.getTempCByIndex(i));
+    tempSensors.getAddress(sensorAddr, i);
+    //digitalWrite(LED_BUILTIN, HIGH); 
+    cnc_print_hk_temp_sensor(tempSensorsName, "BEETLETE", tempSensors.getTempCByIndex(i));
+    digitalWrite(LED_BUILTIN, LOW); 
   }
 
   delay(1000);
